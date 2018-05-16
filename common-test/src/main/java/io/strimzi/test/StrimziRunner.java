@@ -463,6 +463,7 @@ public class StrimziRunner extends BlockJUnit4ClassRunner {
                     // Here we record the state of the cluster
                     LOGGER.info("Creating cluster operator {} before test per @ClusterOperator annotation on {}", cc, name(element));
                     for (String yaml : yamls) {
+                        LOGGER.info("ClusterOperator yaml: {}", yaml);
                         kubeClient().clientWithAdmin().createContent(yaml);
                     }
                     try {
