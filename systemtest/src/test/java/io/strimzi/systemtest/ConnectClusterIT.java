@@ -120,7 +120,7 @@ public class ConnectClusterIT extends AbstractClusterIT {
     @Test
     @JUnitGroup(name = "regression")
     @ConnectCluster(name = CONNECT_CLUSTER_NAME, connectConfig = CONNECT_CONFIG)
-    public void testKafkaConnectScaleUpScaleDown() {
+    public void testKafkaConnectScaleUpScaleDown() throws InterruptedException {
         // kafka cluster Connect already deployed via annotation
         LOGGER.info("Running kafkaConnectScaleUP {}", CONNECT_CLUSTER_NAME);
 
@@ -134,6 +134,20 @@ public class ConnectClusterIT extends AbstractClusterIT {
         kubeClient.waitForDeployment(kafkaConnectName(CONNECT_CLUSTER_NAME));
         connectPods = kubeClient.listResourcesByLabel("pod", "strimzi.io/type=kafka-connect");
         assertEquals(scaleTo, connectPods.size());
+
+        for (String pod : connectPods) {
+            List<Event> events = getEvents("Pod", pod);
+            LOGGER.info("Events for pod {} are: {} ", pod, events);
+        }
+
+        Thread.sleep(120000);
+
+        for (String pod : connectPods) {
+            List<Event> events = getEvents("Pod", pod);
+            LOGGER.info("Events for pod {} afted timeout are: {} ", pod, events);
+        }
+
+
         for (String pod : connectPods) {
             List<Event> events = getEvents("Pod", pod);
             assertThat(events, hasAllOfReasons(Scheduled, Pulled, Created, Started));
