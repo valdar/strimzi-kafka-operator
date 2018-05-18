@@ -85,7 +85,7 @@ public class KafkaClusterIT extends AbstractClusterIT {
     @Test
     @JUnitGroup(name = "acceptance")
     @KafkaCluster(name = CLUSTER_NAME, kafkaNodes = 3, zkNodes = 1)
-    public void testKafkaAndZookeeperScaleUpScaleDown() {
+    public void testKafkaAndZookeeperScaleUpScaleDown() throws InterruptedException {
         // kafka cluster already deployed via annotation
         LOGGER.info("Running kafkaScaleUpScaleDown {}", CLUSTER_NAME);
 
@@ -110,6 +110,14 @@ public class KafkaClusterIT extends AbstractClusterIT {
         for (int brokerId = 0; brokerId < scaleTo; brokerId++) {
             assertTrue(versions, versions.indexOf("(id: " + brokerId + " rack: ") >= 0);
         }
+
+        List<Event> e = getEvents("Pod", newPodName);
+        LOGGER.info("Events for pod {} are: {} ", newPodName, e);
+
+        Thread.sleep(120000);
+
+        e = getEvents("Pod", newPodName);
+        LOGGER.info("Events for pod {} afted timeout are: {} ", newPodName, e);
 
         //Test that the new pod does not have errors or failures in events
         List<Event> events = getEvents("Pod", newPodName);
@@ -142,7 +150,7 @@ public class KafkaClusterIT extends AbstractClusterIT {
     @Test
     @JUnitGroup(name = "regression")
     @KafkaCluster(name = CLUSTER_NAME, kafkaNodes = 1, zkNodes = 1)
-    public void testZookeeperScaleUpScaleDown() {
+    public void testZookeeperScaleUpScaleDown() throws InterruptedException {
         // kafka cluster already deployed via annotation
         LOGGER.info("Running zookeeperScaleUpScaleDown with cluster {}", CLUSTER_NAME);
         //kubeClient.waitForStatefulSet(zookeeperStatefulSetName(CLUSTER_NAME), 1);
@@ -167,6 +175,15 @@ public class KafkaClusterIT extends AbstractClusterIT {
         waitForZkMntr(firstZkPodName, Pattern.compile("zk_server_state\\s+(leader|follower)"));
         waitForZkMntr(newZkPodName[0], Pattern.compile("zk_server_state\\s+(leader|follower)"));
         waitForZkMntr(newZkPodName[1], Pattern.compile("zk_server_state\\s+(leader|follower)"));
+
+        List<Event> e = getEvents("Pod", newZkPodName[0]);
+        LOGGER.info("Events for pod {} are: {} ", newZkPodName[0], e);
+
+        Thread.sleep(120000);
+
+        e = getEvents("Pod", newZkPodName[0]);
+        LOGGER.info("Events for pod {} afted timeout are: {} ", newZkPodName[0], e);
+
 
         //Test that first pod does not have errors or failures in events
         List<Event> eventsForFirstPod = getEvents("Pod", newZkPodName[0]);
