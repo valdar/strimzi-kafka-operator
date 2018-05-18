@@ -173,6 +173,9 @@ public class AbstractClusterIT {
     }
 
     List<Event> getEvents(String resourceType, String resourceName) {
+
+        LOGGER.info("All events for cluster {} {}", kubeClient.namespace(), client.events().inNamespace(kubeClient.namespace()).list().getItems());
+
         return client.events().inNamespace(kubeClient.namespace()).list().getItems().stream()
                 .filter(event -> event.getInvolvedObject().getKind().equals(resourceType))
                 .filter(event -> event.getInvolvedObject().getName().equals(resourceName))
