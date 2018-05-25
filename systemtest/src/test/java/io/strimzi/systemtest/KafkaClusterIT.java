@@ -380,6 +380,7 @@ public class KafkaClusterIT extends AbstractClusterIT {
         //Deleting another topic using pod CLI
         deleteTopicUsingPodCLI(CLUSTER_NAME, kafkaPodName(CLUSTER_NAME, 1), "my-topic");
         List<String> topics = listTopicsUsingPodCLI(CLUSTER_NAME, kafkaPodName(CLUSTER_NAME, 1));
+        LOGGER.info("Current topics" ,listTopicsUsingPodCLI(CLUSTER_NAME, kafkaPodName(CLUSTER_NAME, 1)));
         assertThat(topics, not(hasItems("topic-from-cli", "my-topic")));
     }
 }
