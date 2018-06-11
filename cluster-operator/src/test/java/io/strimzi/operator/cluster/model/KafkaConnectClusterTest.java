@@ -15,6 +15,7 @@ import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,7 +168,7 @@ public class KafkaConnectClusterTest {
         // type mismatch
         cm.getData().put("kafka-healthcheck-delay", "1z");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals(e.getKey(), "kafka-healthcheck-delay");
@@ -177,7 +178,7 @@ public class KafkaConnectClusterTest {
         cm.getData().clear();
         cm.getData().put("kafka-storage", "{ \"type\": \"zidan\" }");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals(e.getKey(), "kafka-storage");
@@ -191,7 +192,7 @@ public class KafkaConnectClusterTest {
                 "\"num.io.threads\": \"1\"" +
                 "}");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("default.replication.factor", e.getKey());
@@ -203,7 +204,7 @@ public class KafkaConnectClusterTest {
                 "\"num.recovery.threads.per.data.dir\": \"1\",\n" +
                 "\"num.io.threads\": \"1\"");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("JSON bracing", e.getKey());
@@ -222,7 +223,7 @@ public class KafkaConnectClusterTest {
                 "\"bool.value\": tru" +
                 "}");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("bool.value", e.getKey());
@@ -274,7 +275,7 @@ public class KafkaConnectClusterTest {
                 "\"transaction.state.log.min.isr\": ,\n" +
                 "\"default.replication.factor\": 2 }");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("Unexpected character - ,", e.getKey());
@@ -287,7 +288,7 @@ public class KafkaConnectClusterTest {
                 "\"transaction.state.log.min.isr\": 7,\n" +
                 "\"default.replication.factor\": }");
         try {
-            KafkaCluster.fromConfigMap(cm);
+            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("Unexpected character - }", e.getKey());

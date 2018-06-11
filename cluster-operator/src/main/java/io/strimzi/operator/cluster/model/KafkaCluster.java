@@ -19,6 +19,7 @@ import io.fabric8.kubernetes.api.model.PodAntiAffinityBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
 import io.fabric8.kubernetes.api.model.ResourceRequirementsBuilder;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.api.model.Volume;
@@ -139,9 +140,10 @@ public class KafkaCluster extends AbstractModel {
      * Create a Kafka cluster from the related ConfigMap resource
      *
      * @param kafkaClusterCm ConfigMap with cluster configuration
+     * @param secrets Secrets related to the cluster
      * @return Kafka cluster instance
      */
-    public static KafkaCluster fromConfigMap(ConfigMap kafkaClusterCm) {
+    public static KafkaCluster fromDescription(ConfigMap kafkaClusterCm, List<Secret> secrets) {
         KafkaCluster kafka = new KafkaCluster(kafkaClusterCm.getMetadata().getNamespace(),
                 kafkaClusterCm.getMetadata().getName(),
                 Labels.fromResource(kafkaClusterCm));
@@ -172,6 +174,17 @@ public class KafkaCluster extends AbstractModel {
             kafka.setRackConfig(rackConfig);
         }
         kafka.setInitImage(Utils.getNonEmptyString(data, KEY_INIT_IMAGE, DEFAULT_INIT_IMAGE));
+
+        if (secrets == null || secrets.isEmpty()) {
+            // TODO: generate certs
+            log.info("Generating certificates ...");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            log.info("... end generating certificates");
+        }
 
         return kafka;
     }
