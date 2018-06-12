@@ -35,7 +35,7 @@ public class KafkaClusterTest {
     private final String metricsCmJson = "{\"animal\":\"wombat\"}";
     private final String configurationJson = "{\"foo\":\"bar\"}";
     private final ConfigMap cm = ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout, metricsCmJson, configurationJson);
-    private final KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+    private final KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.emptyList());
 
     @Test
     public void testMetricsConfigMap() {
@@ -101,7 +101,7 @@ public class KafkaClusterTest {
                 ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout,
                         metricsCmJson, configurationJson, "{}", "{\"type\": \"ephemeral\"}",
                         null, "{\"topologyKey\": \"rack-key\"}");
-        KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+        KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.emptyList());
         StatefulSet ss = kc.generateStatefulSet(true);
         checkStatefulSet(ss, cm, true);
     }
@@ -113,7 +113,7 @@ public class KafkaClusterTest {
                 ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout,
                         metricsCmJson, configurationJson, "{}", "{ \"type\": \"persistent-claim\", \"size\": \"1Gi\" }",
                         null, "{\"topologyKey\": \"rack-key\"}");
-        KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+        KafkaCluster kc = KafkaCluster.fromDescription(cm, Collections.emptyList());
         StatefulSet ss = kc.generateStatefulSet(false);
         checkStatefulSet(ss, cm, false);
     }
@@ -220,7 +220,7 @@ public class KafkaClusterTest {
     public void testCorruptedConfigMap() {
         try {
             ConfigMap cm = ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout, metricsCmJson, "{\"key.name\": oops}");
-            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+            KafkaCluster.fromDescription(cm, Collections.emptyList());
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("key.name", e.getKey());
@@ -232,7 +232,7 @@ public class KafkaClusterTest {
         try {
             ConfigMap cm = ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout,
                     "", configurationJson);
-            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+            KafkaCluster.fromDescription(cm, Collections.emptyList());
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("JSON - empty value", e.getKey());
@@ -242,7 +242,7 @@ public class KafkaClusterTest {
             ConfigMap cm = ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout,
                     "{\"lowercaseOutputName\" : true \n," +
                             "\"rules\": }", configurationJson);
-            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+            KafkaCluster.fromDescription(cm, Collections.emptyList());
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("Unexpected character - }", e.getKey());
@@ -263,7 +263,7 @@ public class KafkaClusterTest {
                             "    }\n" +
                             "    ]\n" +
                             "    }", configurationJson);
-            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+            KafkaCluster.fromDescription(cm, Collections.emptyList());
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("Unexpected character - }", e.getKey());
@@ -273,7 +273,7 @@ public class KafkaClusterTest {
             ConfigMap cm = ResourceUtils.createKafkaClusterConfigMap(namespace, cluster, replicas, image, healthDelay, healthTimeout,
                     "{\"lowercaseOutputName\" : tru \n," +
                             "\"rules\": \"I am valid\" }", configurationJson);
-            KafkaCluster.fromDescription(cm, Collections.EMPTY_LIST);
+            KafkaCluster.fromDescription(cm, Collections.emptyList());
             fail("Expected it to throw an exception");
         } catch (InvalidConfigMapException e) {
             assertEquals("lowercaseOutputName", e.getKey());
