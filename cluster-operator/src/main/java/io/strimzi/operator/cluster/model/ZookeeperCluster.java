@@ -60,11 +60,13 @@ public class ZookeeperCluster extends AbstractModel {
     public static final String KEY_RESOURCES = "zookeeper-resources";
     public static final String KEY_ZOOKEEPER_CONFIG = "zookeeper-config";
     public static final String KEY_AFFINITY = "zookeeper-affinity";
+    public static final String KEY_ZOOKEEPER_LOG_LEVEL = "zookeeper-log-level";
 
     // Zookeeper configuration keys (EnvVariables)
     public static final String ENV_VAR_ZOOKEEPER_NODE_COUNT = "ZOOKEEPER_NODE_COUNT";
     public static final String ENV_VAR_ZOOKEEPER_METRICS_ENABLED = "ZOOKEEPER_METRICS_ENABLED";
     public static final String ENV_VAR_ZOOKEEPER_CONFIGURATION = "ZOOKEEPER_CONFIGURATION";
+    public static final String ENV_VAR_ZOOKEEPER_LOG_LEVEL = "ZOOKEEPER_LOG_LEVEL";
 
     public static String zookeeperClusterName(String cluster) {
         return cluster + ZookeeperCluster.NAME_SUFFIX;
@@ -127,6 +129,7 @@ public class ZookeeperCluster extends AbstractModel {
         zk.setHealthCheckInitialDelay(Utils.getInteger(data, KEY_HEALTHCHECK_DELAY, DEFAULT_HEALTHCHECK_DELAY));
         zk.setHealthCheckTimeout(Utils.getInteger(data, KEY_HEALTHCHECK_TIMEOUT, DEFAULT_HEALTHCHECK_TIMEOUT));
 
+        zk.setDebugLevel(ENV_VAR_ZOOKEEPER_LOG_LEVEL, Utils.getNonEmptyString(data, KEY_ZOOKEEPER_LOG_LEVEL, "INFO"));
         JsonObject metricsConfig = Utils.getJson(data, KEY_METRICS_CONFIG);
         zk.setMetricsEnabled(metricsConfig != null);
         if (zk.isMetricsEnabled()) {
@@ -164,6 +167,7 @@ public class ZookeeperCluster extends AbstractModel {
 
         Map<String, String> vars = containerEnvVars(container);
 
+        zk.setDebugLevel(ENV_VAR_ZOOKEEPER_LOG_LEVEL, Utils.getNonEmptyString(vars, ENV_VAR_ZOOKEEPER_LOG_LEVEL, "INFO"));
         zk.setMetricsEnabled(Utils.getBoolean(vars, ENV_VAR_ZOOKEEPER_METRICS_ENABLED, DEFAULT_ZOOKEEPER_METRICS_ENABLED));
         if (zk.isMetricsEnabled()) {
             zk.setMetricsConfigName(zookeeperMetricsName(cluster));
@@ -236,6 +240,7 @@ public class ZookeeperCluster extends AbstractModel {
         heapOptions(varList, 0.75, 2L * 1024L * 1024L * 1024L);
         jvmPerformanceOptions(varList);
         varList.add(buildEnvVar(ENV_VAR_ZOOKEEPER_CONFIGURATION, configuration.getConfiguration()));
+        varList.add(buildEnvVar(ENV_VAR_ZOOKEEPER_LOG_LEVEL, logLevel));
 
         return varList;
     }

@@ -88,6 +88,8 @@ public abstract class AbstractModel {
     protected final String metricsPortName = "kafkametrics";
     protected boolean isMetricsEnabled;
 
+    protected String logLevel;
+
     protected JsonObject metricsConfig;
     protected String metricsConfigName;
 
@@ -167,6 +169,11 @@ public abstract class AbstractModel {
 
     protected void setMetricsEnabled(boolean isMetricsEnabled) {
         this.isMetricsEnabled = isMetricsEnabled;
+    }
+
+    protected void setDebugLevel(String name, String level) {
+        buildEnvVar(name, level);
+        this.logLevel = level;
     }
 
     protected JsonObject getMetricsConfig() {

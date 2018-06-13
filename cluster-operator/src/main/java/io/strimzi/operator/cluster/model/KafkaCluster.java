@@ -83,11 +83,13 @@ public class KafkaCluster extends AbstractModel {
     public static final String KEY_RACK = "kafka-rack";
     public static final String KEY_INIT_IMAGE = "init-kafka-image";
     public static final String KEY_AFFINITY = "kafka-affinity";
+    public static final String KEY_KAFKA_LOG_LEVEL = "kafka-log-level";
 
     // Kafka configuration keys (EnvVariables)
     public static final String ENV_VAR_KAFKA_ZOOKEEPER_CONNECT = "KAFKA_ZOOKEEPER_CONNECT";
     private static final String ENV_VAR_KAFKA_METRICS_ENABLED = "KAFKA_METRICS_ENABLED";
     protected static final String ENV_VAR_KAFKA_CONFIGURATION = "KAFKA_CONFIGURATION";
+    protected static final String ENV_VAR_KAFKA_LOG_LEVEL = "KAFKA_LOG_LEVEL";
 
     /**
      * Constructor
@@ -147,6 +149,7 @@ public class KafkaCluster extends AbstractModel {
         kafka.setImage(Utils.getNonEmptyString(data, KEY_IMAGE, DEFAULT_IMAGE));
         kafka.setHealthCheckInitialDelay(Utils.getInteger(data, KEY_HEALTHCHECK_DELAY, DEFAULT_HEALTHCHECK_DELAY));
         kafka.setHealthCheckTimeout(Utils.getInteger(data, KEY_HEALTHCHECK_TIMEOUT, DEFAULT_HEALTHCHECK_TIMEOUT));
+        kafka.setDebugLevel(ENV_VAR_KAFKA_LOG_LEVEL, Utils.getNonEmptyString(data, KEY_KAFKA_LOG_LEVEL, "INFO"));
 
         kafka.setZookeeperConnect(kafkaClusterCm.getMetadata().getName() + "-zookeeper:2181");
 
@@ -195,6 +198,7 @@ public class KafkaCluster extends AbstractModel {
 
         kafka.setZookeeperConnect(vars.getOrDefault(ENV_VAR_KAFKA_ZOOKEEPER_CONNECT, ss.getMetadata().getName() + "-zookeeper:2181"));
 
+        kafka.setDebugLevel(ENV_VAR_KAFKA_LOG_LEVEL, Utils.getNonEmptyString(vars, ENV_VAR_KAFKA_LOG_LEVEL, "INFO"));
         kafka.setMetricsEnabled(Utils.getBoolean(vars, ENV_VAR_KAFKA_METRICS_ENABLED, DEFAULT_KAFKA_METRICS_ENABLED));
         if (kafka.isMetricsEnabled()) {
             kafka.setMetricsConfigName(metricConfigsName(cluster));
@@ -441,6 +445,7 @@ public class KafkaCluster extends AbstractModel {
         if (configuration != null) {
             varList.add(buildEnvVar(ENV_VAR_KAFKA_CONFIGURATION, configuration.getConfiguration()));
         }
+        varList.add(buildEnvVar(ENV_VAR_KAFKA_LOG_LEVEL, logLevel));
 
         return varList;
     }

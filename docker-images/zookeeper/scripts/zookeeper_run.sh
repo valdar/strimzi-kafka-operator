@@ -30,11 +30,13 @@ echo "Starting Zookeeper with configuration:"
 echo ""
 
 if [ -z "$ZOOKEEPER_LOG_LEVEL" ]; then
-  ZOOKEEPER_LOG_LEVEL="DEBUG"
+  ZOOKEEPER_LOG_LEVEL="INFO"
 fi
 if [ -z "$ZOO_LOG4J_PROP" ]; then
   export ZOO_LOG4J_PROP="$ZOOKEEPER_LOG_LEVEL,CONSOLE"
 fi
+
+export KAFKA_LOG4J_OPTS="-Dlog4j.configuration=file:$KAFKA_HOME/config/log4j.properties -Dzookeeper.root.logger=$ZOOKEEPER_LOG_LEVEL"
 
 # enabling Prometheus JMX exporter as Java agent
 if [ "$ZOOKEEPER_METRICS_ENABLED" = "true" ]; then
